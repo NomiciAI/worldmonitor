@@ -55,6 +55,9 @@ export class App {
 
     const isMobile = isMobileDevice();
     const isDesktopApp = isDesktopRuntime();
+    const urlParams = new URL(location.href).searchParams;
+    const embedMode =
+      urlParams.get("embed") === "1" || urlParams.get("mode") === "nomici";
     const monitors = loadFromStorage<Monitor[]>(STORAGE_KEYS.monitors, []);
 
     // Use mobile-specific defaults on first load (no saved layers)
@@ -191,11 +194,16 @@ export class App {
     }
     const disabledSources = new Set(loadFromStorage<string[]>(STORAGE_KEYS.disabledFeeds, []));
 
+    if (embedMode) {
+      document.documentElement.dataset.embed = "1";
+    }
+
     // Build shared state object
     this.state = {
       map: null,
       isMobile,
       isDesktopApp,
+      embedMode,
       container: el,
       panels: {},
       newsPanels: {},
